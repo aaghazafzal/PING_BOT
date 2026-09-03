@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { BookOpen, Copy, Check, ChevronDown, ChevronRight, Globe, Key, BarChart3, Zap } from "lucide-react";
+import { BookOpen, Copy, Check, ChevronDown, ChevronRight, Globe, Key, BarChart3, Zap, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
-
 import { type LucideIcon } from "lucide-react";
+
+const BASE_URL = "https://ping.univora.website";
 
 interface Endpoint {
   method: "GET" | "POST" | "DELETE";
@@ -146,56 +147,100 @@ const methodColors: Record<string, string> = {
   DELETE: "bg-red-500/10 text-red-500 border-red-500/20",
 };
 
+function buildPageText(): string {
+  let out = "PingBot API Documentation\n";
+  out += "=".repeat(40) + "\n";
+  out += `Base URL: ${BASE_URL}\n\n`;
+
+  for (const cat of endpoints) {
+    out += `\n## ${cat.category}\n`;
+    for (const ep of cat.items) {
+      out += `\n[${ep.method}] ${BASE_URL}${ep.path}\n`;
+      out += `Description: ${ep.description}\n`;
+      out += `Auth: ${ep.auth ? "Required" : "None"}\n`;
+      if (ep.params && ep.params.length > 0) {
+        out += "Parameters:\n";
+        for (const p of ep.params) {
+          out += `  - ${p.name} (${p.type})${p.required ? " [required]" : ""}: ${p.description}\n`;
+        }
+      }
+      out += `Response:\n${ep.response}\n`;
+    }
+  }
+  return out;
+}
+
 export default function DocsPage() {
   const [openEndpoint, setOpenEndpoint] = useState<string | null>(null);
   const [copiedPath, setCopiedPath] = useState<string | null>(null);
+  const [copiedPage, setCopiedPage] = useState(false);
 
   const copyPath = (path: string) => {
-    navigator.clipboard.writeText(path);
+    navigator.clipboard.writeText(`${BASE_URL}${path}`);
     setCopiedPath(path);
     setTimeout(() => setCopiedPath(null), 2000);
   };
 
+  const copyPage = () => {
+    navigator.clipboard.writeText(buildPageText());
+    setCopiedPage(true);
+    setTimeout(() => setCopiedPage(false), 2000);
+  };
+
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-fade-in-up">
-      <div>
-        <h1 className="text-3xl lg:text-4xl font-bold tracking-tight">API Documentation</h1>
-        <p className="text-muted-foreground mt-1.5">Integrate PingBot data into your own applications.</p>
+    <div className="max-w-4xl mx-auto space-y-6 animate-fade-in-up">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">API Docs</h1>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">Integrate PingBot data into your own applications.</p>
+        </div>
+        {/* Copy Page Button */}
+        <button
+          onClick={copyPage}
+          className={cn(
+            "flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border transition-all",
+            copiedPage
+              ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/30"
+              : "bg-muted/50 text-muted-foreground border-border/50 hover:bg-muted hover:text-foreground"
+          )}
+        >
+          {copiedPage ? <Check className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
+          <span className="hidden sm:inline">{copiedPage ? "Copied!" : "Copy Docs"}</span>
+        </button>
       </div>
 
       {/* Quick Start */}
-      <div className="glass-card rounded-2xl p-6">
+      <div className="glass-card rounded-2xl p-4 sm:p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="p-2 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10">
             <BookOpen className="w-5 h-5 text-primary" />
           </div>
-          <h2 className="font-semibold text-lg">Quick Start</h2>
+          <h2 className="font-semibold text-base sm:text-lg">Quick Start</h2>
         </div>
-        <div className="space-y-4 text-sm text-muted-foreground">
+        <div className="space-y-3 text-sm text-muted-foreground">
           <p>All API endpoints require authentication via your session cookie (set through Telegram login).</p>
-          <div className="bg-muted/50 rounded-xl p-4 font-mono text-xs leading-relaxed border border-border/50">
-            <p className="text-muted-foreground/60"># Example: Fetch your dashboard data</p>
-            <p className="mt-1">
-              <span className="text-emerald-500">curl</span> -X GET {`"http://localhost:3000/api/dashboard"`}
+
+          <div className="bg-muted/50 rounded-xl p-3 sm:p-4 font-mono text-[11px] sm:text-xs leading-relaxed border border-border/50 overflow-x-auto">
+            <p className="text-muted-foreground/60"># Fetch your dashboard data</p>
+            <p className="mt-1 break-all sm:break-normal">
+              <span className="text-emerald-500">curl</span>{" "}
+              {`"${BASE_URL}/api/dashboard"`}
             </p>
-            <p className="pl-4">
-              -H {`"Cookie: session_token=your_token_here"`}
+            <p className="pl-0 sm:pl-4 break-all sm:break-normal">
+              {`  -H "Cookie: session_token=your_token_here"`}
             </p>
           </div>
-          <div className="bg-muted/50 rounded-xl p-4 font-mono text-xs leading-relaxed border border-border/50">
-            <p className="text-muted-foreground/60"># Example: Create an API key</p>
-            <p className="mt-1">
-              <span className="text-blue-500">curl</span> -X POST {`"http://localhost:3000/api/keys"`}
+
+          <div className="bg-muted/50 rounded-xl p-3 sm:p-4 font-mono text-[11px] sm:text-xs leading-relaxed border border-border/50 overflow-x-auto">
+            <p className="text-muted-foreground/60"># Create an API key</p>
+            <p className="mt-1 break-all sm:break-normal">
+              <span className="text-blue-500">curl</span> -X POST{" "}
+              {`"${BASE_URL}/api/keys"`}
             </p>
-            <p className="pl-4">
-              -H {`"Content-Type: application/json"`}
-            </p>
-            <p className="pl-4">
-              -H {`"Cookie: session_token=your_token_here"`}
-            </p>
-            <p className="pl-4">
-              -d {`'{"name": "My Key"}'`}
-            </p>
+            <p className="pl-0 sm:pl-4">{`  -H "Content-Type: application/json"`}</p>
+            <p className="pl-0 sm:pl-4">{`  -H "Cookie: session_token=your_token_here"`}</p>
+            <p className="pl-0 sm:pl-4">{`  -d '{"name": "My Key"}'`}</p>
           </div>
         </div>
       </div>
@@ -203,75 +248,78 @@ export default function DocsPage() {
       {/* Endpoints */}
       {endpoints.map((cat) => (
         <div key={cat.category}>
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-2 mb-3">
             <cat.icon className="w-4 h-4 text-muted-foreground" />
-            <h2 className="text-lg font-semibold">{cat.category}</h2>
+            <h2 className="text-base sm:text-lg font-semibold">{cat.category}</h2>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2">
             {cat.items.map((ep) => {
               const epKey = `${ep.method}-${ep.path}`;
               const isOpen = openEndpoint === epKey;
               return (
                 <div key={epKey} className="glass-card rounded-2xl overflow-hidden">
+                  {/* Endpoint Header */}
                   <button
                     onClick={() => setOpenEndpoint(isOpen ? null : epKey)}
-                    className="w-full flex items-center gap-3 p-4 text-left hover:bg-muted/30 transition-colors"
+                    className="w-full flex items-center gap-2 p-3 sm:p-4 text-left hover:bg-muted/30 transition-colors min-w-0"
                   >
-                    <span className={cn("text-[10px] font-bold px-2.5 py-1 rounded-md border uppercase tracking-wider", methodColors[ep.method])}>
+                    <span className={cn("flex-shrink-0 text-[10px] font-bold px-2 py-1 rounded-md border uppercase tracking-wider", methodColors[ep.method])}>
                       {ep.method}
                     </span>
-                    <code className="font-mono text-sm flex-1">{ep.path}</code>
+                    <code className="font-mono text-xs sm:text-sm flex-1 truncate min-w-0">{ep.path}</code>
                     <button
                       onClick={(e) => { e.stopPropagation(); copyPath(ep.path); }}
-                      className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+                      className="flex-shrink-0 p-1.5 rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+                      title="Copy full URL"
                     >
                       {copiedPath === ep.path ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                     </button>
-                    {isOpen ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
+                    {isOpen ? <ChevronDown className="flex-shrink-0 w-4 h-4 text-muted-foreground" /> : <ChevronRight className="flex-shrink-0 w-4 h-4 text-muted-foreground" />}
                   </button>
 
+                  {/* Endpoint Detail */}
                   {isOpen && (
-                    <div className="px-4 pb-4 pt-0 border-t border-border/30 space-y-4">
+                    <div className="px-3 sm:px-4 pb-4 pt-0 border-t border-border/30 space-y-4">
                       <p className="text-sm text-muted-foreground pt-3">{ep.description}</p>
+
+                      {/* Full URL */}
+                      <div className="flex items-center gap-2 bg-muted/30 rounded-xl px-3 py-2 border border-border/30 overflow-hidden">
+                        <span className="text-[10px] text-muted-foreground flex-shrink-0">URL</span>
+                        <code className="text-xs font-mono text-foreground/80 truncate flex-1 min-w-0">{BASE_URL}{ep.path}</code>
+                      </div>
 
                       {ep.auth && (
                         <div className="flex items-center gap-1.5 text-xs text-amber-500">
-                          <Key className="w-3 h-3" />
+                          <Key className="w-3 h-3 flex-shrink-0" />
                           <span>Requires authentication</span>
                         </div>
                       )}
 
+                      {/* Params - Mobile card style instead of table */}
                       {ep.params && ep.params.length > 0 && (
                         <div>
                           <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Parameters</h4>
-                          <div className="bg-muted/30 rounded-xl overflow-hidden border border-border/30">
-                            <table className="w-full text-sm">
-                              <thead>
-                                <tr className="border-b border-border/30">
-                                  <th className="text-left px-4 py-2 text-[10px] font-semibold text-muted-foreground uppercase">Name</th>
-                                  <th className="text-left px-4 py-2 text-[10px] font-semibold text-muted-foreground uppercase">Type</th>
-                                  <th className="text-left px-4 py-2 text-[10px] font-semibold text-muted-foreground uppercase">Required</th>
-                                  <th className="text-left px-4 py-2 text-[10px] font-semibold text-muted-foreground uppercase">Description</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {ep.params.map((p) => (
-                                  <tr key={p.name} className="border-b border-border/20 last:border-0">
-                                    <td className="px-4 py-2 font-mono text-xs">{p.name}</td>
-                                    <td className="px-4 py-2 text-xs text-muted-foreground">{p.type}</td>
-                                    <td className="px-4 py-2 text-xs">{p.required ? "✓" : "—"}</td>
-                                    <td className="px-4 py-2 text-xs text-muted-foreground">{p.description}</td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
+                          <div className="space-y-2">
+                            {ep.params.map((p) => (
+                              <div key={p.name} className="bg-muted/30 rounded-xl p-3 border border-border/30">
+                                <div className="flex items-center gap-2 flex-wrap mb-1">
+                                  <code className="text-xs font-mono font-semibold text-foreground">{p.name}</code>
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">{p.type}</span>
+                                  {p.required && (
+                                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-500">required</span>
+                                  )}
+                                </div>
+                                <p className="text-xs text-muted-foreground">{p.description}</p>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       )}
 
+                      {/* Response */}
                       <div>
                         <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Response</h4>
-                        <pre className="bg-muted/30 rounded-xl p-4 text-xs font-mono border border-border/30 overflow-x-auto text-muted-foreground">
+                        <pre className="bg-muted/30 rounded-xl p-3 text-[11px] sm:text-xs font-mono border border-border/30 overflow-x-auto text-muted-foreground whitespace-pre-wrap break-words sm:whitespace-pre sm:break-normal">
                           {ep.response}
                         </pre>
                       </div>
