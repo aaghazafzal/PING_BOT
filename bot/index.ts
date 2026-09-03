@@ -5,7 +5,7 @@ import crypto from 'crypto';
 
 const prisma = new PrismaClient();
 const botToken = process.env.BOT_TOKEN;
-const WEB_URL = process.env.WEB_URL || 'http://localhost:3000';
+const WEB_URL = process.env.WEB_URL || 'https://ping.univora.website';
 
 if (!botToken) {
   console.error("❌ BOT_TOKEN is not defined.");
