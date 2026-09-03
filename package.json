@@ -1,0 +1,39 @@
+{
+  "name": "ping-bot",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"next dev\" \"tsx bot/index.ts\"",
+    "build": "npx prisma generate && next build",
+    "start": "concurrently \"next start\" \"tsx bot/index.ts\"",
+    "lint": "next lint",
+    "bot": "tsx bot/index.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "5.22.0",
+    "axios": "^1.20.0",
+    "clsx": "^2.1.1",
+    "concurrently": "^10.0.5",
+    "date-fns": "^4.4.0",
+    "framer-motion": "^13.1.1",
+    "lucide-react": "^1.37.0",
+    "next": "14.2.15",
+    "next-themes": "^0.4.6",
+    "react": "^18",
+    "react-dom": "^18",
+    "tailwind-merge": "^3.6.0",
+    "telegraf": "^4.16.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.15",
+    "postcss": "^8",
+    "prisma": "5.22.0",
+    "tailwindcss": "^3.4.1",
+    "tsx": "^4.23.13",
+    "typescript": "^5"
+  }
+}

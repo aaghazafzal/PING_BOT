@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  telegramId String    @unique
+  name       String?
+  username   String?
+  photoUrl   String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  jobs       PingJob[]
+  sessions   Session[]
+  apiKeys    ApiKey[]
+}
+
+model Session {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  token     String   @unique
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model ApiKey {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  key       String    @unique
+  name      String    @default("Default Key")
+  userId    String    @db.ObjectId
+  user      User      @relation(fields: [userId], references: [id])
+  lastUsed  DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model PingJob {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  url       String
+  interval  Int
+  isActive  Boolean   @default(true)
+  lastPing  DateTime?
+  userId    String    @db.ObjectId
+  user      User      @relation(fields: [userId], references: [id])
+  logs      PingLog[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model PingLog {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  jobId      String   @db.ObjectId
+  job        PingJob  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  latency    Int?
+  statusCode Int?
+  success    Boolean
+  timestamp  DateTime @default(now())
+}
