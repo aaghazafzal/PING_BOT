@@ -71,7 +71,7 @@ export default function AnalyticsPage() {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Latency Chart */}
-        <div className="glass-card rounded-2xl p-6">
+        <div className="glass-card rounded-2xl p-4 sm:p-6 min-w-0">
           <div className="flex items-center gap-2 mb-6">
             <Clock className="w-4 h-4 text-violet-500" />
             <h3 className="font-semibold text-sm">Latency Over Time</h3>
@@ -81,7 +81,7 @@ export default function AnalyticsPage() {
               No data yet. Pings will appear here.
             </div>
           ) : (
-            <div className="h-48 flex items-end gap-1">
+            <div className="h-48 w-full flex items-end gap-0.5 sm:gap-1">
               {chartData.map((d, i) => (
                 <div
                   key={i}
@@ -106,7 +106,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Success/Fail Chart */}
-        <div className="glass-card rounded-2xl p-6">
+        <div className="glass-card rounded-2xl p-4 sm:p-6 min-w-0">
           <div className="flex items-center gap-2 mb-6">
             <BarChart3 className="w-4 h-4 text-emerald-500" />
             <h3 className="font-semibold text-sm">Pings Per Hour</h3>
@@ -116,7 +116,7 @@ export default function AnalyticsPage() {
               No data yet. Pings will appear here.
             </div>
           ) : (
-            <div className="h-48 flex items-end gap-1">
+            <div className="h-48 w-full flex items-end gap-0.5 sm:gap-1">
               {chartData.map((d, i) => (
                 <div key={i} className="flex-1 flex flex-col justify-end gap-px group relative">
                   {d.fail > 0 && (
