@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import {
-  UserCircle,
   Shield,
   Key,
   Copy,
@@ -239,7 +237,7 @@ export default function ProfilePage() {
                     <AlertTriangle className="w-5 h-5 text-warning" />
                   </div>
                   <div className="flex-1 min-w-0 w-full">
-                    <p className="text-sm font-semibold text-warning mb-2">Copy your key now — won't be shown again!</p>
+                    <p className="text-sm font-semibold text-warning mb-2">Copy your key now — won&apos;t be shown again!</p>
                     <div className="flex flex-col sm:flex-row gap-3">
                       <code className="flex-1 text-[13px] font-mono bg-background/80 px-4 py-2.5 rounded-xl border border-border/50 break-all text-foreground shadow-inner">
                         {showNewKey}

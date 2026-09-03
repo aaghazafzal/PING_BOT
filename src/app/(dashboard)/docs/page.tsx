@@ -4,6 +4,8 @@ import { useState } from "react";
 import { BookOpen, Copy, Check, ChevronDown, ChevronRight, Globe, Key, BarChart3, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import { type LucideIcon } from "lucide-react";
+
 interface Endpoint {
   method: "GET" | "POST" | "DELETE";
   path: string;
@@ -13,7 +15,7 @@ interface Endpoint {
   response: string;
 }
 
-const endpoints: { category: string; icon: any; items: Endpoint[] }[] = [
+const endpoints: { category: string; icon: LucideIcon; items: Endpoint[] }[] = [
   {
     category: "Authentication",
     icon: Key,

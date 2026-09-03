@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BarChart3, TrendingUp, Clock, CheckCircle2, XCircle } from "lucide-react";
+import { BarChart3, Clock, CheckCircle2, XCircle } from "lucide-react";
 
 interface Log {
   id: string;

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Globe, Activity, Zap, Clock, TrendingUp, Wifi, WifiOff } from "lucide-react";
+import { Globe, Zap, Clock, TrendingUp } from "lucide-react";
+import { type LucideIcon } from "lucide-react";
 
 interface Stats {
   totalJobs: number;
@@ -144,7 +145,7 @@ function StatCard({
   title: string;
   value: string | number;
   subtitle: string;
-  icon: any;
+  icon: LucideIcon;
   gradient: string;
   iconColor: string;
 }) {
