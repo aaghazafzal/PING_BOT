@@ -38,7 +38,7 @@ export async function GET() {
     .slice(-24);
 
   // Per-job stats
-  const jobIds = [...new Set(logs.map((l) => l.jobId))];
+  const jobIds = Array.from(new Set(logs.map((l) => l.jobId)));
   const jobStats = await Promise.all(
     jobIds.map(async (jobId) => {
       const job = await prisma.pingJob.findUnique({ where: { id: jobId } });
