@@ -18,6 +18,73 @@ function generateToken(length = 64): string {
   return crypto.randomBytes(length).toString('hex').slice(0, length);
 }
 
+const FSUB_CHANNEL_ID = '-1002657096509';
+const FSUB_CHANNEL_LINK = 'https://t.me/Univora88';
+const GROUP_LINK = 'https://t.me/UNIVORA_CHAT';
+
+// Force Join Middleware
+bot.use(async (ctx, next) => {
+  if (ctx.chat?.type === 'private') {
+    try {
+      const member = await ctx.telegram.getChatMember(FSUB_CHANNEL_ID, ctx.from!.id);
+      if (['left', 'kicked', 'restricted'].includes(member.status)) {
+        if (ctx.callbackQuery && (ctx.callbackQuery as any).data === 'refresh_fsub') {
+          return ctx.answerCbQuery('❌ You haven\\'t joined the channel yet!', { show_alert: true });
+        }
+        const msg = `👋 <b>Hello <a href="tg://user?id=${ctx.from!.id}">${ctx.from!.first_name}</a>!</b>\n\nTo use this bot, you must join our official channel. Please join and click "Refresh".`;
+        return ctx.reply(msg, {
+          parse_mode: 'HTML',
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '📢 Join Channel', url: FSUB_CHANNEL_LINK }],
+              [{ text: '🔄 Refresh', callback_data: 'refresh_fsub' }]
+            ]
+          },
+          disable_web_page_preview: true,
+        });
+      } else {
+        if (ctx.callbackQuery && (ctx.callbackQuery as any).data === 'refresh_fsub') {
+          await ctx.deleteMessage().catch(() => {});
+          await ctx.reply('✅ <b>Thank you for joining!</b> Send /start to begin.', { parse_mode: 'HTML' });
+          return;
+        }
+      }
+    } catch (e) {
+      console.log('Fsub check error:', e);
+    }
+  }
+  return next();
+});
+
+const startMessage = (ctx: any) => {
+  const telegramId = ctx.from?.id.toString();
+  const name = ctx.from?.first_name || 'User';
+  const botUsername = ctx.botInfo?.username || 'PingBot';
+
+  return `
+✦ 𝗪𝗲𝗹𝗰𝗼𝗺𝗲 𝘁𝗼 <a href="tg://resolve?domain=${botUsername}">𝗣𝗶𝗻𝗴𝗕𝗼𝘁</a>, <a href="tg://user?id=${telegramId}">${name}</a>! ✦
+
+<blockquote>🤖 <b>Your Ultimate Uptime Guardian</b>
+I am here to keep an eye on your websites, APIs, and servers. If anything goes offline, I will notify you instantly!
+
+📈 <b>Key Features:</b>
+• 24/7 Uptime Monitoring
+• Real-time Latency Tracking
+• Detailed Web Analytics
+• Instant Outage Alerts</blockquote>
+
+<i>Tap the buttons below to explore what I can do!</i>
+`;
+};
+
+const startMarkup = {
+  inline_keyboard: [
+    [{ text: '📖 Help & Commands', callback_data: 'help_menu' }],
+    [{ text: '📢 Channel', url: FSUB_CHANNEL_LINK }, { text: '💬 Group', url: GROUP_LINK }],
+    [{ text: 'ℹ️ About', callback_data: 'about_menu' }, { text: '👨‍💻 Developer', url: 'https://t.me/aaghazafzal' }]
+  ]
+};
+
 // ───────────────── /start ─────────────────
 bot.command('start', async (ctx) => {
   const telegramId = ctx.from?.id.toString();
@@ -25,24 +92,11 @@ bot.command('start', async (ctx) => {
   const username = ctx.from?.username || null;
   if (!telegramId) return;
 
-  // 1. Reply instantly
-  const msg = `
-✦ 𝗪𝗲𝗹𝗰𝗼𝗺𝗲 𝘁𝗼 𝗣𝗶𝗻𝗴𝗕𝗼𝘁, ${name}! ✦
-
-<blockquote>🔔 Keep your websites alive and monitor uptime with precision. Get real-time analytics, latency tracking, and instant alerts — all from Telegram.</blockquote>
-
-<b>⚡ Quick Commands:</b>
-
-  /add <code>&lt;url&gt; &lt;minutes&gt;</code> — Start monitoring a URL
-  /remove <code>&lt;url&gt;</code> — Stop monitoring a URL
-  /list — View your active monitors
-  /stats — Quick performance overview
-  /login — Open the web dashboard 🌐
-  /help — Full command reference
-
-<i>💡 Tip: Use /login to access the premium web dashboard with charts, API keys, and detailed analytics.</i>
-`;
-  await ctx.reply(msg, { parse_mode: 'HTML' });
+  await ctx.reply(startMessage(ctx), { 
+    parse_mode: 'HTML',
+    reply_markup: startMarkup,
+    disable_web_page_preview: true 
+  });
 
   // 2. Ensure user is in DB instantly
   await prisma.user.upsert({
@@ -82,6 +136,59 @@ bot.command('start', async (ctx) => {
   })();
 });
 
+// ───────────────── Button Menus ─────────────────
+bot.action('start_menu', async (ctx) => {
+  await ctx.editMessageText(startMessage(ctx), {
+    parse_mode: 'HTML',
+    reply_markup: startMarkup,
+    disable_web_page_preview: true
+  }).catch(() => {});
+});
+
+bot.action('help_menu', async (ctx) => {
+  const msg = `
+📖 <b>𝗣𝗶𝗻𝗴𝗕𝗼𝘁 — Command Reference</b>
+
+<b>🔹 Monitor Management</b>
+  /add <code>&lt;url&gt; &lt;interval&gt;</code>
+  /remove <code>&lt;url&gt;</code>
+  /pause <code>&lt;url&gt;</code>
+  /resume <code>&lt;url&gt;</code>
+  /list
+
+<b>🔹 Analytics & Account</b>
+  /stats
+  /login
+
+<blockquote>🌐 The web dashboard provides detailed charts, API key management, and full analytics history.</blockquote>
+`;
+  await ctx.editMessageText(msg, {
+    parse_mode: 'HTML',
+    reply_markup: {
+      inline_keyboard: [[{ text: '⬅️ Back', callback_data: 'start_menu' }]]
+    },
+    disable_web_page_preview: true
+  }).catch(() => {});
+});
+
+bot.action('about_menu', async (ctx) => {
+  const msg = `
+ℹ️ <b>𝗔𝗯𝗼𝘂𝘁 𝗣𝗶𝗻𝗴𝗕𝗼𝘁</b>
+
+PingBot is an advanced server and website monitoring tool designed for Telegram. Built with Next.js, Prisma, and Telegraf, it ensures your digital assets are always online.
+
+<b>Version:</b> 1.0.0
+<b>Developer:</b> <a href="https://t.me/aaghazafzal">AAGHAZ</a>
+`;
+  await ctx.editMessageText(msg, {
+    parse_mode: 'HTML',
+    reply_markup: {
+      inline_keyboard: [[{ text: '⬅️ Back', callback_data: 'start_menu' }]]
+    },
+    disable_web_page_preview: true
+  }).catch(() => {});
+});
+
 // ───────────────── /help ─────────────────
 bot.command('help', async (ctx) => {
   const msg = `
@@ -104,17 +211,16 @@ bot.command('help', async (ctx) => {
   /list
   <i>View all your active monitors with status.</i>
 
-<b>🔹 Analytics</b>
+<b>🔹 Analytics & Account</b>
   /stats
   <i>Quick overview: total pings, avg latency, uptime %.</i>
 
-<b>🔹 Account</b>
   /login
   <i>Get a secure login link for the web dashboard.</i>
 
 <blockquote>🌐 The web dashboard provides detailed charts, API key management, and full analytics history.</blockquote>
 `;
-  ctx.reply(msg, { parse_mode: 'HTML' });
+  ctx.reply(msg, { parse_mode: 'HTML', disable_web_page_preview: true });
 });
 
 // ───────────────── /add ─────────────────
