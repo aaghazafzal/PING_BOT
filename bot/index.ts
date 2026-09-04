@@ -40,7 +40,7 @@ bot.use(async (ctx, next) => {
               [{ text: '🔄 Refresh', callback_data: 'refresh_fsub' }]
             ]
           },
-          disable_web_page_preview: true,
+          link_preview_options: { is_disabled: true },
         });
       } else {
         if (ctx.callbackQuery && (ctx.callbackQuery as any).data === 'refresh_fsub') {
@@ -95,7 +95,7 @@ bot.command('start', async (ctx) => {
   await ctx.reply(startMessage(ctx), { 
     parse_mode: 'HTML',
     reply_markup: startMarkup,
-    disable_web_page_preview: true 
+    link_preview_options: { is_disabled: true } 
   });
 
   // 2. Ensure user is in DB instantly
@@ -141,7 +141,7 @@ bot.action('start_menu', async (ctx) => {
   await ctx.editMessageText(startMessage(ctx), {
     parse_mode: 'HTML',
     reply_markup: startMarkup,
-    disable_web_page_preview: true
+    link_preview_options: { is_disabled: true }
   }).catch(() => {});
 });
 
@@ -167,7 +167,7 @@ bot.action('help_menu', async (ctx) => {
     reply_markup: {
       inline_keyboard: [[{ text: '⬅️ Back', callback_data: 'start_menu' }]]
     },
-    disable_web_page_preview: true
+    link_preview_options: { is_disabled: true }
   }).catch(() => {});
 });
 
