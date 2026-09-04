@@ -81,7 +81,7 @@ const startMarkup = {
   inline_keyboard: [
     [{ text: '📖 Help & Commands', callback_data: 'help_menu' }],
     [{ text: '📢 Channel', url: FSUB_CHANNEL_LINK }, { text: '💬 Group', url: GROUP_LINK }],
-    [{ text: 'ℹ️ About', callback_data: 'about_menu' }, { text: '👨‍💻 Developer', url: 'https://t.me/aaghazafzal' }]
+    [{ text: 'ℹ️ About', callback_data: 'about_menu' }, { text: '👨‍💻 Developer', url: 'https://t.me/ROLEX_SIIR' }]
   ]
 };
 
@@ -145,56 +145,10 @@ bot.action('start_menu', async (ctx) => {
   }).catch(() => {});
 });
 
-bot.action('help_menu', async (ctx) => {
-  const msg = `
+const helpMessageText = `
 📖 <b>𝗣𝗶𝗻𝗴𝗕𝗼𝘁 — Command Reference</b>
 
-<b>🔹 Monitor Management</b>
-  /add <code>&lt;url&gt; &lt;interval&gt;</code>
-  /remove <code>&lt;url&gt;</code>
-  /pause <code>&lt;url&gt;</code>
-  /resume <code>&lt;url&gt;</code>
-  /list
-
-<b>🔹 Analytics & Account</b>
-  /stats
-  /login
-
-<blockquote>🌐 The web dashboard provides detailed charts, API key management, and full analytics history.</blockquote>
-`;
-  await ctx.editMessageText(msg, {
-    parse_mode: 'HTML',
-    reply_markup: {
-      inline_keyboard: [[{ text: '⬅️ Back', callback_data: 'start_menu' }]]
-    },
-    link_preview_options: { is_disabled: true }
-  }).catch(() => {});
-});
-
-bot.action('about_menu', async (ctx) => {
-  const msg = `
-ℹ️ <b>𝗔𝗯𝗼𝘂𝘁 𝗣𝗶𝗻𝗴𝗕𝗼𝘁</b>
-
-PingBot is an advanced server and website monitoring tool designed for Telegram. Built with Next.js, Prisma, and Telegraf, it ensures your digital assets are always online.
-
-<b>Version:</b> 1.0.0
-<b>Developer:</b> <a href="https://t.me/aaghazafzal">AAGHAZ</a>
-`;
-  await ctx.editMessageText(msg, {
-    parse_mode: 'HTML',
-    reply_markup: {
-      inline_keyboard: [[{ text: '⬅️ Back', callback_data: 'start_menu' }]]
-    },
-    link_preview_options: { is_disabled: true }
-  }).catch(() => {});
-});
-
-// ───────────────── /help ─────────────────
-bot.command('help', async (ctx) => {
-  const msg = `
-📖 <b>𝗣𝗶𝗻𝗴𝗕𝗼𝘁 — Command Reference</b>
-
-<b>🔹 Monitor Management</b>
+🔹 <b>Monitor Management</b>
   /add <code>&lt;url&gt; &lt;interval&gt;</code>
   <i>Add a new URL to monitor. Interval is in minutes.</i>
   <i>Example:</i> <code>/add https://google.com 5</code>
@@ -211,7 +165,7 @@ bot.command('help', async (ctx) => {
   /list
   <i>View all your active monitors with status.</i>
 
-<b>🔹 Analytics & Account</b>
+🔹 <b>Analytics & Account</b>
   /stats
   <i>Quick overview: total pings, avg latency, uptime %.</i>
 
@@ -220,7 +174,38 @@ bot.command('help', async (ctx) => {
 
 <blockquote>🌐 The web dashboard provides detailed charts, API key management, and full analytics history.</blockquote>
 `;
-  ctx.reply(msg, { parse_mode: 'HTML', link_preview_options: { is_disabled: true } });
+
+bot.action('help_menu', async (ctx) => {
+  await ctx.editMessageText(helpMessageText, {
+    parse_mode: 'HTML',
+    reply_markup: {
+      inline_keyboard: [[{ text: '⬅️ Back to Start', callback_data: 'start_menu' }]]
+    },
+    link_preview_options: { is_disabled: true }
+  }).catch(() => {});
+});
+
+bot.action('about_menu', async (ctx) => {
+  const msg = `
+ℹ️ <b>𝗔𝗯𝗼𝘂𝘁 𝗣𝗶𝗻𝗴𝗕𝗼𝘁</b>
+
+PingBot is an advanced server and website monitoring tool designed for Telegram. Built with Next.js, Prisma, and Telegraf, it ensures your digital assets are always online.
+
+<b>Version:</b> 1.0.0
+<b>Developer:</b> <a href="https://t.me/ROLEX_SIIR">ROLEX SIIR</a>
+`;
+  await ctx.editMessageText(msg, {
+    parse_mode: 'HTML',
+    reply_markup: {
+      inline_keyboard: [[{ text: '⬅️ Back', callback_data: 'start_menu' }]]
+    },
+    link_preview_options: { is_disabled: true }
+  }).catch(() => {});
+});
+
+// ───────────────── /help ─────────────────
+bot.command('help', async (ctx) => {
+  ctx.reply(helpMessageText, { parse_mode: 'HTML', link_preview_options: { is_disabled: true } });
 });
 
 // ───────────────── /add ─────────────────
