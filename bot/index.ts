@@ -185,7 +185,7 @@ PingBot is an advanced server and website monitoring tool designed for Telegram.
     reply_markup: {
       inline_keyboard: [[{ text: '⬅️ Back', callback_data: 'start_menu' }]]
     },
-    disable_web_page_preview: true
+    link_preview_options: { is_disabled: true }
   }).catch(() => {});
 });
 
@@ -220,7 +220,7 @@ bot.command('help', async (ctx) => {
 
 <blockquote>🌐 The web dashboard provides detailed charts, API key management, and full analytics history.</blockquote>
 `;
-  ctx.reply(msg, { parse_mode: 'HTML', disable_web_page_preview: true });
+  ctx.reply(msg, { parse_mode: 'HTML', link_preview_options: { is_disabled: true } });
 });
 
 // ───────────────── /add ─────────────────
