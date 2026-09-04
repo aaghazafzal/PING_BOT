@@ -29,7 +29,7 @@ bot.use(async (ctx, next) => {
       const member = await ctx.telegram.getChatMember(FSUB_CHANNEL_ID, ctx.from!.id);
       if (['left', 'kicked', 'restricted'].includes(member.status)) {
         if (ctx.callbackQuery && (ctx.callbackQuery as any).data === 'refresh_fsub') {
-          return ctx.answerCbQuery('❌ You haven\\'t joined the channel yet!', { show_alert: true });
+          return ctx.answerCbQuery("❌ You haven't joined the channel yet!", { show_alert: true });
         }
         const msg = `👋 <b>Hello <a href="tg://user?id=${ctx.from!.id}">${ctx.from!.first_name}</a>!</b>\n\nTo use this bot, you must join our official channel. Please join and click "Refresh".`;
         return ctx.reply(msg, {
