@@ -533,7 +533,7 @@ bot.telegram.setMyCommands([
   { command: 'stats', description: 'Quick performance overview' },
   { command: 'login', description: 'Open the web dashboard' },
   { command: 'help', description: 'Full command reference' }
-]);
+]).catch(err => console.error('⚠️ Failed to set bot commands:', err.message));
 
 // Self-Ping to Prevent Render Sleep
 const RENDER_URL = process.env.RENDER_EXTERNAL_URL || process.env.WEB_URL;
@@ -551,6 +551,8 @@ if (RENDER_URL) {
 // Launch bot
 bot.launch().then(() => {
   console.log('🤖 Telegram Bot is running!');
+}).catch(err => {
+  console.error('❌ Failed to launch bot:', err.message);
 });
 
 process.once('SIGINT', () => bot.stop('SIGINT'));
